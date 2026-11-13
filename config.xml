@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.pixelquest.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/-1.0">
+    <name>PixelQuest</name>
+    <description>PixelQuest Görev &amp; Rütbe Uygulaması</description>
+    <author email="dev@pixelquest.local" href="http://pixelquest.local">PixelQuest Team</author>
+    <content src="index.html" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <platform name="android">
+        <allow-intent href="market:*/*" />
+    </platform>
+</widget>

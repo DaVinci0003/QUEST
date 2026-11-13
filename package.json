@@ -1,0 +1,7 @@
+{
+  "name": "pixelquest",
+  "version": "1.0.0",
+  "description": "PixelQuest Android App",
+  "private": true,
+  "dependencies": {}
+}
