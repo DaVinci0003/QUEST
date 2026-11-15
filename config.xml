@@ -4,9 +4,16 @@
     <description>PixelQuest Görev &amp; Rütbe Uygulaması</description>
     <author email="dev@pixelquest.local" href="http://pixelquest.local">PixelQuest Team</author>
     <content src="index.html" />
+    <icon src="res/icon/android/icon.png" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <platform name="android">
+        <icon src="res/icon/android/icon.png" density="ldpi" />
+        <icon src="res/icon/android/icon.png" density="mdpi" />
+        <icon src="res/icon/android/icon.png" density="hdpi" />
+        <icon src="res/icon/android/icon.png" density="xhdpi" />
+        <icon src="res/icon/android/icon.png" density="xxhdpi" />
+        <icon src="res/icon/android/icon.png" density="xxxhdpi" />
         <allow-intent href="market:*/*" />
     </platform>
 </widget>
