@@ -29,6 +29,8 @@ jobs:
       - name: Create Cordova Project
         run: |
           cordova create myapp com.pixelquest.app PixelQuest
+          cp config.xml myapp/config.xml
+          cp -r res myapp/res
           cd myapp
           cordova platform add android
           rm -rf www/*
