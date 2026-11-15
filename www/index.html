@@ -92,6 +92,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            cursor: pointer;
         }
         .rank-badge {
             width: 42px;
@@ -135,6 +136,25 @@
             transition: width 0.4s ease;
         }
 
+        /* Ayarlar İkonu */
+        .settings-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #fff;
+            transition: background 0.2s;
+        }
+        .settings-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
         /* Haftalık Seri Barı */
         .weekly-series {
             background: rgba(20, 20, 30, 0.75);
@@ -148,7 +168,6 @@
             justify-content: space-between;
             align-items: center;
             position: relative;
-            overflow: hidden;
         }
         .day-box {
             width: 36px;
@@ -173,36 +192,6 @@
         .day-box .day-star {
             font-size: 14px;
             margin-top: 2px;
-        }
-
-        /* Haftalık Tamamlama Kutlaması (Pazar gününe özel dev yıldız birleşimi) */
-        .weekly-grand-star {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(20, 20, 30, 0.95);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            z-index: 5;
-            animation: fadeInWeekly 0.5s ease;
-        }
-        @keyframes fadeInWeekly {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .grand-star-icon {
-            font-size: 36px;
-            animation: grandPulse 1.5s infinite alternate;
-            filter: drop-shadow(0 0 15px #ffd700);
-        }
-        @keyframes grandPulse {
-            0% { transform: scale(1) rotate(0deg); }
-            100% { transform: scale(1.2) rotate(10deg); }
         }
 
         /* Bölüm Başlığı */
@@ -267,13 +256,13 @@
             white-space: nowrap;
         }
 
-        /* Tamamlanmış Görev: Komple Sarı, Yazılar Yok, Merkezde Yüksek Kaliteli Piksel Yıldız */
+        /* Tamamlanmış Görev & Sağdan Soldan Gelen Yıldız Animasyonu */
         .task-card.completed {
             background: #ffd700 !important;
             border-color: #ffaa00 !important;
             justify-content: center !important;
             cursor: default;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
             padding: 18px;
         }
         .task-card.completed .task-info,
@@ -281,21 +270,44 @@
         .task-card.completed .pending-overlay {
             display: none !important;
         }
-        
-        /* Kaliteli Piksel Yıldız İkonu */
-        .pixel-star-icon {
-            width: 32px;
-            height: 32px;
-            display: inline-block;
-            position: relative;
-            background: #ff4500;
+
+        /* Görev Tamamlanırken Sağdan ve Soldan Gelen Yıldızlar */
+        .flying-star-left, .flying-star-right {
+            position: absolute;
+            font-size: 24px;
+            z-index: 10;
+            filter: drop-shadow(0 0 8px #ff4500);
+            pointer-events: none;
+        }
+        @keyframes flyLeftToCenter {
+            0% { transform: translate(-120px, 0) scale(0.5) rotate(0deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translate(0, 0) scale(1.2) rotate(360deg); opacity: 1; }
+        }
+        @keyframes flyRightToCenter {
+            0% { transform: translate(120px, 0) scale(0.5) rotate(0deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translate(0, 0) scale(1.2) rotate(-360deg); opacity: 1; }
+        }
+        .animate-fly-left {
+            animation: flyLeftToCenter 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .animate-fly-right {
+            animation: flyRightToCenter 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Merkezdeki Kırmızı Piksel Yıldız */
+        .center-red-star {
+            width: 34px;
+            height: 34px;
+            background: #ff2200;
             clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-            box-shadow: 0 0 12px #fff, 0 0 20px #ffaa00;
-            animation: starPulse 1.8s infinite alternate ease-in-out;
+            box-shadow: 0 0 15px #ffd700, 0 0 25px #ff2200;
+            animation: starPulse 1.5s infinite alternate ease-in-out;
         }
         @keyframes starPulse {
-            0% { transform: scale(1) rotate(0deg); filter: brightness(1); }
-            100% { transform: scale(1.15) rotate(5deg); filter: brightness(1.25); }
+            0% { transform: scale(1); filter: brightness(1); }
+            100% { transform: scale(1.2); filter: brightness(1.3); }
         }
 
         /* 5 Saniye Onay / Tamamlama Modu */
@@ -343,95 +355,186 @@
             transition: width 5s linear;
         }
 
-        /* Geniş Görev Ekleme Butonu */
-        .add-task-btn {
+        /* Yeni Görev İsteme: Büyük Artı Düğmesi ve Sağa Sola Bölünme Animasyonu */
+        .add-task-container {
             width: 100%;
-            background: rgba(30, 30, 45, 0.75);
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        .big-plus-btn {
+            width: 60px;
+            height: 60px;
+            background: rgba(40, 40, 60, 0.85);
             backdrop-filter: blur(10px);
-            border: 1px dashed rgba(255, 255, 255, 0.35);
-            border-radius: 14px;
-            padding: 14px;
-            color: #eee;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
             transition: all 0.2s;
-            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
         }
-        .add-task-btn:hover {
-            background: rgba(50, 50, 75, 0.9);
-            border-color: rgba(255, 255, 255, 0.7);
-            color: #fff;
+        .big-plus-btn:hover {
+            transform: scale(1.1);
+            border-color: #ffd700;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+        }
+        .plus-icon {
+            font-size: 28px;
+            color: #ffd700;
+            font-weight: bold;
+            transition: transform 0.4s ease;
+        }
+        /* Artının Ortadan İkiye Bölünme / Sağa Sola Açılma Efekti */
+        .big-plus-btn.splitting .plus-left {
+            transform: translateX(-20px) rotate(-45deg);
+            opacity: 0;
+        }
+        .big-plus-btn.splitting .plus-right {
+            transform: translateX(20px) rotate(45deg);
+            opacity: 0;
         }
 
-        /* Rütbe Atlama Modal / Pop-up Ekranı */
-        #rank-up-modal {
+        /* Rütbe Listesi Modalı */
+        .modal-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.85);
-            z-index: 200;
+            z-index: 250;
             display: flex;
             justify-content: center;
             align-items: center;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.3s ease;
         }
-        #rank-up-modal.active {
+        .modal-overlay.active {
             opacity: 1;
             pointer-events: auto;
         }
-        .rank-up-card {
-            background: linear-gradient(135deg, #2a2a3d, #1a1a26);
+        .modal-card {
+            background: linear-gradient(135deg, #222233, #151520);
             border: 2px solid #ffd700;
             border-radius: 20px;
-            padding: 24px;
-            width: 85%;
-            max-width: 320px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-            animation: modalPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 20px;
+            width: 90%;
+            max-width: 350px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 35px rgba(255, 215, 0, 0.4);
         }
-        @keyframes modalPop {
-            0% { transform: scale(0.7); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .rank-up-card h2 {
+        .modal-card h2 {
             color: #ffd700;
-            font-size: 18px;
-            margin-bottom: 12px;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 15px;
             letter-spacing: 1px;
         }
-        .rank-up-card p {
-            color: #ddd;
+        .rank-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             font-size: 13px;
-            margin-bottom: 20px;
-            line-height: 1.4;
         }
-        .rank-up-btn {
+        .rank-list-item.current {
+            background: rgba(255, 215, 0, 0.15);
+            border-radius: 8px;
+            border-color: #ffd700;
+            color: #ffd700;
+            font-weight: bold;
+        }
+        .close-modal-btn {
+            width: 100%;
+            margin-top: 15px;
             background: #ffd700;
             color: #000;
             border: none;
-            padding: 10px 24px;
-            border-radius: 10px;
+            padding: 10px;
+            border-radius: 8px;
             font-weight: bold;
-            font-size: 13px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(255,215,0,0.4);
-            transition: transform 0.1s;
-        }
-        .rank-up-btn:active {
-            transform: scale(0.95);
         }
 
-        /* Açılış Splash Ekranı */
+        /* Rütbe Atlama Titreme & Pop-up Efekti */
+        @keyframes rankShake {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            20% { transform: translate(-4px, 2px) rotate(-3deg); }
+            40% { transform: translate(4px, -2px) rotate(3deg); }
+            60% { transform: translate(-4px, -2px) rotate(-2deg); }
+            80% { transform: translate(4px, 2px) rotate(2deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        .shake-animation {
+            animation: rankShake 0.5s ease-in-out;
+        }
+
+        /* Haftalık Tamamlama Pazar Günü Kutlama Efekti (Dev Yıldız) */
+        #weekly-celebration {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 10, 0.92);
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        #weekly-celebration.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .mega-star {
+            width: 90px;
+            height: 90px;
+            background: #ffd700;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            box-shadow: 0 0 50px #ffd700, 0 0 100px rgba(255,215,0,0.6);
+            animation: megaPulse 1.2s infinite alternate ease-in-out;
+        }
+        @keyframes megaPulse {
+            0% { transform: scale(0.9) rotate(0deg); }
+            100% { transform: scale(1.15) rotate(15deg); }
+        }
+
+        /* Ayarlar Modalı */
+        .settings-group {
+            margin-bottom: 12px;
+        }
+        .settings-group label {
+            font-size: 11px;
+            color: #aaa;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .settings-group input {
+            width: 100%;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 6px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 12px;
+        }
+
+        /* Açılış İkon/Logo Büyüme Animasyonu (İkon ile Tam Uyumlu) */
         #splash-screen {
             position: absolute;
             top: 0;
@@ -439,73 +542,87 @@
             width: 100%;
             height: 100%;
             background: #050508;
-            z-index: 300;
+            z-index: 400;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            transition: opacity 0.9s cubic-bezier(0.77, 0, 0.175, 1), transform 0.9s cubic-bezier(0.77, 0, 0.175, 1);
+            transition: opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1), transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
         }
         #splash-screen.zoom-out {
             opacity: 0;
-            transform: scale(8);
+            transform: scale(10);
             pointer-events: none;
         }
-        .splash-star-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            animation: splashGrow 1.2s infinite alternate ease-in-out;
-        }
-        .big-pixel-star {
-            width: 80px;
-            height: 80px;
+        .splash-star-icon {
+            width: 90px;
+            height: 90px;
             background: #ffd700;
             clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-            box-shadow: 0 0 35px #ffd700, 0 0 70px rgba(255,215,0,0.6);
+            box-shadow: 0 0 40px #ffd700, 0 0 80px rgba(255,215,0,0.7);
+            animation: splashPulse 1s infinite alternate ease-in-out;
         }
-        @keyframes splashGrow {
-            0% { transform: scale(0.9); }
+        @keyframes splashPulse {
+            0% { transform: scale(0.95); }
             100% { transform: scale(1.1); }
-        }
-        .splash-title {
-            font-size: 16px;
-            color: #ffd700;
-            letter-spacing: 2px;
-            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
 <div class="phone-frame">
-    <!-- Açılış Ekranı: Yıldızın İçinden Geçiş -->
+    <!-- Açılış Ekranı: Yıldız İkonu Büyüme Geçişi -->
     <div id="splash-screen">
-        <div class="splash-star-container">
-            <div class="big-pixel-star"></div>
-            <div class="splash-title">PIXELQUEST</div>
+        <div class="splash-star-icon"></div>
+    </div>
+
+    <!-- Rütbe Listesi Modalı -->
+    <div class="modal-overlay" id="rank-modal">
+        <div class="modal-card">
+            <h2>🏆 RÜTBE KADEMELERİ</h2>
+            <div id="rank-list-container"></div>
+            <button class="close-modal-btn" onclick="toggleRankModal(false)">KAPAT</button>
         </div>
     </div>
 
-    <!-- Rütbe Atlama Modalı -->
-    <div id="rank-up-modal">
-        <div class="rank-up-card">
-            <h2>🎉 RÜTBE ATLADIN!</h2>
-            <p id="rank-up-msg">Tebrikler kahraman! Yeni rütbene ulaştın ve gücün katlandı.</p>
-            <button class="rank-up-btn" onclick="closeRankModal()">DEVAM ET</button>
+    <!-- Ayarlar Modalı -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-card">
+            <h2>⚙️ BİLDİRİM AYARLARI</h2>
+            <p style="font-size:11px; color:#bbb; margin-bottom:12px;">Günlük 3 bildirim zamanını ayarlayın:</p>
+            <div class="settings-group">
+                <label>1. Bildirim (Sabah)</label>
+                <input type="time" id="notif-1" value="09:00">
+            </div>
+            <div class="settings-group">
+                <label>2. Bildirim (Öğleden Sonra)</label>
+                <input type="time" id="notif-2" value="14:00">
+            </div>
+            <div class="settings-group">
+                <label>3. Bildirim (Akşam)</label>
+                <input type="time" id="notif-3" value="20:00">
+            </div>
+            <button class="close-modal-btn" onclick="saveSettings()">KAYDET & AKTİFLEŞTİR</button>
         </div>
     </div>
 
-    <!-- Animasyonlu Dinamik Arka Plan -->
+    <!-- Pazar Günü Hafta Tamamlama Dev Yıldız Kutlaması -->
+    <div id="weekly-celebration">
+        <div class="mega-star"></div>
+        <h2 style="color:#ffd700; font-size:16px; text-align:center;">HAFTA BAŞARIYLA TAMAMLANDI!</h2>
+        <p style="color:#ddd; font-size:12px; text-align:center; padding:0 20px;">7 gün boyunca tüm görevleri tamamlayarak muazzam bir seriye ulaştın!</p>
+        <button class="rank-up-btn" onclick="closeWeeklyCelebration()" style="margin-top:10px; background:#ffd700; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;">HARİKA!</button>
+    </div>
+
+    <!-- Animasyonlu Kanvas Arka Plan -->
     <canvas id="bg-canvas"></canvas>
 
     <!-- Uygulama Arayüzü -->
     <div class="app-container">
         <!-- Header -->
         <div class="header">
-            <div class="rank-info">
-                <div class="rank-badge" id="rank-badge-icon">🛡️</div>
+            <div class="rank-info" onclick="toggleRankModal(true)">
+                <div class="rank-badge" id="rank-badge-icon">⭐</div>
                 <div class="rank-text">
                     <h3 id="rank-title">Demir I</h3>
                     <p><span id="current-xp">0</span> / <span id="max-xp">100</span> XP</p>
@@ -514,7 +631,10 @@
                     </div>
                 </div>
             </div>
-            <div style="font-size: 11px; color: #ddd; text-align: right;" id="time-display">07:00</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <div style="font-size: 11px; color: #ddd; text-align: right;" id="time-display">07:00</div>
+                <button class="settings-btn" onclick="toggleSettingsModal(true)">⚙️</button>
+            </div>
         </div>
 
         <!-- Haftalık Seri -->
@@ -524,10 +644,15 @@
         <div class="section-title">Günlük Görev Havuzu</div>
         <div class="tasks-container" id="tasks-list"></div>
 
-        <!-- Geniş Ekleme Butonu -->
-        <button class="add-task-btn" onclick="addNewTask()">
-            <span>+ Yeni Görev İste & Havuzdan Çek</span>
-        </button>
+        <!-- Yeni Görev İsteme: Büyük Artı Düğmesi -->
+        <div class="add-task-container">
+            <div class="big-plus-btn" onclick="addNewTaskWithAnimation(this)">
+                <div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; position:relative;">
+                    <span class="plus-icon plus-left" style="position:absolute; left:18px;">+</span>
+                    <span class="plus-icon plus-right" style="position:absolute; right:18px;">+</span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -551,7 +676,7 @@
     let player = {
         xp: 0,
         rankLevel: 1,
-        currentStreak: [true, true, true, true, true, true, true] // Pzt-Paz (Pazar dahil tamamlanmış test için)
+        currentStreak: [true, true, true, true, true, true, false] // Pzt-Cmt tamam, Pazar (index 6) henüz değil
     };
 
     const ranks = [
@@ -594,11 +719,9 @@
         if (rank.goldFrame) badge.classList.add("gold-frame");
         else badge.classList.remove("gold-frame");
 
-        // Haftalık Seri & Pazar Büyük Yıldız Birleşimi
+        // Haftalık Seri Render (Pazar dahil)
         let days = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
-        let allCompleted = player.currentStreak.every(val => val === true);
         let weeklyHTML = "";
-        
         for (let i = 0; i < 7; i++) {
             let isComp = player.currentStreak[i];
             weeklyHTML += `
@@ -608,24 +731,15 @@
                 </div>
             `;
         }
-
-        if (allCompleted) {
-            weeklyHTML += `
-                <div class="weekly-grand-star">
-                    <div class="grand-star-icon">⭐</div>
-                    <div style="font-size:11px; color:#ffd700; font-weight:bold;">HAFTA TAMAMLANDI! BİRLEŞEN YILDIZ</div>
-                </div>
-            `;
-        }
         document.getElementById("weekly-container").innerHTML = weeklyHTML;
 
-        // Görevler
+        // Görevler Render
         let tasksHTML = "";
         activeTasks.forEach((t, idx) => {
             if (t.completed) {
                 tasksHTML += `
-                    <div class="task-card completed">
-                        <div class="pixel-star-icon"></div>
+                    <div class="task-card completed" style="position:relative;">
+                        <div class="center-red-star"></div>
                     </div>
                 `;
             } else if (t.pending) {
@@ -689,32 +803,109 @@
         t.pending = false;
         t.completed = true;
 
-        // XP ve Rütbe Kontrolü
+        // Sağdan ve soldan yıldız uçuş animasyonu elementleri ekle
+        let cardEl = document.querySelectorAll('.task-card')[idx];
+        if (cardEl) {
+            let leftStar = document.createElement('div');
+            leftStar.className = 'flying-star-left animate-fly-left';
+            leftStar.innerHTML = '⭐';
+            leftStar.style.left = '10px';
+            leftStar.style.top = '50%';
+            cardEl.appendChild(leftStar);
+
+            let rightStar = document.createElement('div');
+            rightStar.className = 'flying-star-right animate-fly-right';
+            rightStar.innerHTML = '⭐';
+            rightStar.style.right = '10px';
+            rightStar.style.top = '50%';
+            cardEl.appendChild(rightStar);
+        }
+
+        // XP ve Rütbe Kontrolü (Rank her gün sıfırlanmaz, kalıcıdır)
         player.xp += t.xp;
         let currentRankMax = ranks[player.rankLevel - 1].max;
         if (player.xp >= currentRankMax) {
             player.xp -= currentRankMax;
             player.rankLevel = Math.min(ranks.length, player.rankLevel + 1);
-            showRankUpModal(ranks[player.rankLevel - 1].name);
+            triggerRankShakeAndUp(ranks[player.rankLevel - 1].name);
         }
-        updateUI();
-    }
 
-    function showRankUpModal(newRankName) {
-        document.getElementById("rank-up-msg").innerText = `Tebrikler kahraman! Başarıyla rütbe atladın ve yeni unvanın: ${newRankName}`;
-        document.getElementById("rank-up-modal").classList.add("active");
-    }
+        // Pazar günü (index 6) görevi tamamlandıysa ve tüm hafta bittiyse dev yıldız göster
+        player.currentStreak[6] = true; // Test amaçlı pazar tamamlandı sayalım
+        if (player.currentStreak.every(v => v === true)) {
+            setTimeout(() => {
+                document.getElementById("weekly-celebration").classList.add("active");
+            }, 800);
+        }
 
-    function closeRankModal() {
-        document.getElementById("rank-up-modal").classList.remove("active");
-    }
-
-    function addNewTask() {
-        let newT = getRandomTasks(1)[0];
-        if (newT) {
-            activeTasks.push(newT);
+        setTimeout(() => {
             updateUI();
+        }, 600);
+    }
+
+    function triggerRankShakeAndUp(newRankName) {
+        let badge = document.getElementById("rank-badge-icon");
+        badge.classList.add("shake-animation");
+        setTimeout(() => badge.classList.remove("shake-animation"), 600);
+    }
+
+    function closeWeeklyCelebration() {
+        document.getElementById("weekly-celebration").classList.remove("active");
+    }
+
+    // Artı butonuna basınca sağa sola bölünme ve yeni görev ekleme
+    function addNewTaskWithAnimation(btn) {
+        btn.classList.add("splitting");
+        setTimeout(() => {
+            let newT = getRandomTasks(1)[0];
+            if (newT) {
+                activeTasks.push(newT);
+                updateUI();
+            }
+            btn.classList.remove("splitting");
+        }, 400);
+    }
+
+    // Rütbe Listesi Modalı
+    function toggleRankModal(show) {
+        let modal = document.getElementById("rank-modal");
+        if (show) {
+            let html = "";
+            ranks.forEach((r, idx) => {
+                let isCurrent = (idx + 1 === player.rankLevel);
+                html += `
+                    <div class="rank-list-item ${isCurrent ? 'current' : ''}">
+                        <span>${idx + 1}. ${r.name}</span>
+                        <span>${isCurrent ? '★ (Mevcut)' : r.max + ' XP'}</span>
+                    </div>
+                `;
+            });
+            document.getElementById("rank-list-container").innerHTML = html;
+            modal.classList.add("active");
+        } else {
+            modal.classList.remove("active");
         }
+    }
+
+    // Ayarlar Modalı
+    function toggleSettingsModal(show) {
+        let modal = document.getElementById("settings-modal");
+        if (show) modal.classList.add("active");
+        else modal.classList.remove("active");
+    }
+
+    function saveSettings() {
+        let t1 = document.getElementById("notif-1").value;
+        let t2 = document.getElementById("notif-2").value;
+        let t3 = document.getElementById("notif-3").value;
+        
+        // Bildifim simülasyonu / web notifications API request
+        if ("Notification" in window && Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+        alert(`Bildirimler başarıyla ayarlandı!
+Günlük Saatler: ${t1}, ${t2}, ${t3}`);
+        toggleSettingsModal(false);
     }
 
     // Animasyonlu Kanvas Arka Plan
@@ -843,10 +1034,11 @@
         resizeCanvas();
         requestAnimationFrame(drawAnimatedBackground);
 
+        // Açılış İkon Animasyonu (İkon ile Tam Uyumlu Büyüme Geçişi)
         setTimeout(() => {
             let splash = document.getElementById("splash-screen");
             splash.classList.add("zoom-out");
-        }, 1300);
+        }, 1200);
     };
 </script>
 </body>
